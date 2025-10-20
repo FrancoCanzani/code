@@ -24,6 +24,12 @@ export const productSchema = z.object({
   demo_url: z.url('Please enter a valid URL').optional(),
   pricing_model: z.enum(['free', 'freemium', 'premium']),
   promo_code: z.string().optional(),
+  twitter_url: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
+  linkedin_url: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
+  product_hunt_url: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
+  platforms: z
+    .array(z.enum(['web', 'ios', 'android', 'desktop', 'api', 'browser_extension', 'other']))
+    .min(1, 'Select at least one platform'),
 }).refine((data) => {
   // If open source, repo_url is required
   if (data.is_open_source && !data.repo_url) {

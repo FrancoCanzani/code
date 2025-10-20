@@ -27,6 +27,10 @@ export function ProductForm({ onSubmit, defaultValues }: ProductFormProps) {
       demo_url: defaultValues?.demo_url,
       pricing_model: defaultValues?.pricing_model || 'free',
       promo_code: defaultValues?.promo_code,
+      twitter_url: defaultValues?.twitter_url,
+      linkedin_url: defaultValues?.linkedin_url,
+      product_hunt_url: defaultValues?.product_hunt_url,
+      platforms: defaultValues?.platforms || ['web'],
     },
     onSubmit: async ({ value }) => {
       setIsSubmitting(true)
@@ -157,56 +161,118 @@ export function ProductForm({ onSubmit, defaultValues }: ProductFormProps) {
           }}
         </form.Field>
 
-        <form.Field name="is_open_source">
+        <form.Field
+          name="platforms"
+          validators={{
+            onChange: productSchema.shape.platforms,
+          }}
+        >
           {(field) => {
+            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+            const platformOptions = [
+              { value: 'web', label: 'Web' },
+              { value: 'ios', label: 'iOS' },
+              { value: 'android', label: 'Android' },
+              { value: 'desktop', label: 'Desktop' },
+              { value: 'api', label: 'API' },
+              { value: 'browser_extension', label: 'Browser Extension' },
+            ]
+
+            const togglePlatform = (platform: string) => {
+              const current = field.state.value
+              if (current.includes(platform as any)) {
+                field.handleChange(current.filter((p) => p !== platform))
+              } else {
+                field.handleChange([...current, platform as any])
+              }
+            }
+
             return (
-              <Field orientation="horizontal">
-                <input
-                  id="is_open_source"
-                  type="checkbox"
-                  checked={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.checked)}
-                  className="w-4 h-4"
-                />
-                <FieldLabel htmlFor="is_open_source">
-                  Is this open source?
+              <Field>
+                <FieldLabel>
+                  Platform Availability *
                 </FieldLabel>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {platformOptions.map((option) => (
+                    <label
+                      key={option.value}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={field.state.value.includes(option.value as any)}
+                        onChange={() => togglePlatform(option.value)}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm">{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+                <FieldDescription>
+                  Select all platforms where your product is available
+                </FieldDescription>
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
             )
           }}
         </form.Field>
 
-        {form.state.values.is_open_source && (
-          <form.Field
-            name="repo_url"
-            validators={{
-              onChange: productSchema.shape.repo_url,
-            }}
-          >
-            {(field) => {
-              return (
-                <Field>
-                  <FieldLabel htmlFor="repo_url">
-                    Repository URL *
-                  </FieldLabel>
+        <form.Field name="is_open_source">
+          {(field) => {
+            return (
+              <>
+                <Field orientation="horizontal">
                   <input
-                    id="repo_url"
-                    type="url"
-                    value={field.state.value || ''}
+                    id="is_open_source"
+                    type="checkbox"
+                    checked={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value || undefined)}
-                    className="w-full border px-3 py-2"
-                    placeholder="https://github.com/username/repo"
+                    onChange={(e) => field.handleChange(e.target.checked)}
+                    className="w-4 h-4"
                   />
-                  <FieldDescription>
-                    Link to your GitHub/GitLab repository
-                  </FieldDescription>
+                  <FieldLabel htmlFor="is_open_source">
+                    Is this open source?
+                  </FieldLabel>
                 </Field>
-              )
-            }}
-          </form.Field>
-        )}
+
+                {field.state.value && (
+                  <form.Field
+                    name="repo_url"
+                    validators={{
+                      onChangeListenTo: ['is_open_source'],
+                      onChange: productSchema.shape.repo_url,
+                    }}
+                  >
+                    {(repoField) => {
+                      const isInvalid = repoField.state.meta.isTouched && !repoField.state.meta.isValid
+                      return (
+                        <Field>
+                          <FieldLabel htmlFor="repo_url">
+                            Repository URL *
+                          </FieldLabel>
+                          <input
+                            id="repo_url"
+                            type="url"
+                            value={repoField.state.value || ''}
+                            onBlur={repoField.handleBlur}
+                            onChange={(e) => repoField.handleChange(e.target.value || undefined)}
+                            className="w-full border px-3 py-2"
+                            aria-invalid={isInvalid}
+                            placeholder="https://github.com/username/repo"
+                          />
+                          <FieldDescription>
+                            Link to your GitHub/GitLab repository
+                          </FieldDescription>
+                          {isInvalid && <FieldError errors={repoField.state.meta.errors} />}
+                        </Field>
+                      )
+                    }}
+                  </form.Field>
+                )}
+              </>
+            )
+          }}
+        </form.Field>
 
         <form.Field
           name="description"
@@ -450,6 +516,97 @@ export function ProductForm({ onSubmit, defaultValues }: ProductFormProps) {
             )
           }}
         </form.Field>
+
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Social Media</h3>
+          
+          <form.Field
+            name="twitter_url"
+            validators={{
+              onChange: productSchema.shape.twitter_url,
+            }}
+          >
+            {(field) => {
+              return (
+                <Field>
+                  <FieldLabel htmlFor="twitter_url">
+                    Twitter/X URL
+                  </FieldLabel>
+                  <input
+                    id="twitter_url"
+                    type="url"
+                    value={field.state.value || ''}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value || undefined)}
+                    className="w-full border px-3 py-2"
+                    placeholder="https://twitter.com/yourhandle"
+                  />
+                  <FieldDescription>
+                    Your Twitter/X profile or product account
+                  </FieldDescription>
+                </Field>
+              )
+            }}
+          </form.Field>
+
+          <form.Field
+            name="linkedin_url"
+            validators={{
+              onChange: productSchema.shape.linkedin_url,
+            }}
+          >
+            {(field) => {
+              return (
+                <Field>
+                  <FieldLabel htmlFor="linkedin_url">
+                    LinkedIn URL
+                  </FieldLabel>
+                  <input
+                    id="linkedin_url"
+                    type="url"
+                    value={field.state.value || ''}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value || undefined)}
+                    className="w-full border px-3 py-2"
+                    placeholder="https://linkedin.com/company/yourcompany"
+                  />
+                  <FieldDescription>
+                    Your LinkedIn company or profile page
+                  </FieldDescription>
+                </Field>
+              )
+            }}
+          </form.Field>
+
+          <form.Field
+            name="product_hunt_url"
+            validators={{
+              onChange: productSchema.shape.product_hunt_url,
+            }}
+          >
+            {(field) => {
+              return (
+                <Field>
+                  <FieldLabel htmlFor="product_hunt_url">
+                    Product Hunt URL
+                  </FieldLabel>
+                  <input
+                    id="product_hunt_url"
+                    type="url"
+                    value={field.state.value || ''}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value || undefined)}
+                    className="w-full border px-3 py-2"
+                    placeholder="https://producthunt.com/posts/yourproduct"
+                  />
+                  <FieldDescription>
+                    Link to your Product Hunt launch (if applicable)
+                  </FieldDescription>
+                </Field>
+              )
+            }}
+          </form.Field>
+        </div>
       </FieldGroup>
 
       <div className="mt-8 flex gap-4">
