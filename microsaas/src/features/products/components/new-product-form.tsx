@@ -9,10 +9,10 @@ import { useState } from 'react'
 interface ProductFormProps {
   onSubmit: (data: z.infer<typeof productSchema>) => Promise<void>
   defaultValues?: Partial<z.infer<typeof productSchema>>
+  isSubmitting?: boolean
 }
 
-export function ProductForm({ onSubmit, defaultValues }: ProductFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
+export function ProductForm({ onSubmit, defaultValues, isSubmitting }: ProductFormProps) {
 
   const form = useForm({
     defaultValues: {
@@ -20,7 +20,7 @@ export function ProductForm({ onSubmit, defaultValues }: ProductFormProps) {
       tagline: defaultValues?.tagline || '',
       website_url: defaultValues?.website_url || '',
       repo_url: defaultValues?.repo_url,
-      is_open_source: defaultValues?.is_open_source || false,
+      is_open_source: !!defaultValues?.repo_url || false,
       description: defaultValues?.description || '',
       tags: defaultValues?.tags || [],
       logo_url: defaultValues?.logo_url,
@@ -33,12 +33,7 @@ export function ProductForm({ onSubmit, defaultValues }: ProductFormProps) {
       platforms: defaultValues?.platforms || ['web'],
     },
     onSubmit: async ({ value }) => {
-      setIsSubmitting(true)
-      try {
-        await onSubmit(value)
-      } finally {
-        setIsSubmitting(false)
-      }
+      await onSubmit(value)
     },
   })
 

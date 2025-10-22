@@ -1,34 +1,31 @@
 'use client'
 
 import { ProductForm } from '@/features/products/components/new-product-form'
-import { createClient } from '@/utils/supabase/client'
+import { useCreateProduct } from '@/features/products/mutations'
 import { useRouter } from 'next/navigation'
 import { productSchema } from '@/features/products/schemas'
 import { z } from 'zod'
+import { toast } from 'sonner'
 
 export default function NewProductPage() {
   const router = useRouter()
-  const supabase = createClient()
+  const createProductMutation = useCreateProduct()
 
   const handleSubmit = async (data: z.infer<typeof productSchema>) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (!user) {
-        alert('You must be logged in to submit a product')
-        router.push('/login')
-        return
-      }
-
-      // TODO: Insert into database once schema is set up
-      console.log('Product data:', data)
-      
-      // For now, just show success message
-      alert('Product submitted successfully! (Database integration coming soon)')
+      await createProductMutation.mutateAsync(data)
+      toast.success('Product submitted successfully!')
       router.push('/')
     } catch (error) {
-      console.error('Error submitting product:', error)
-      alert('Failed to submit product. Please try again.')
+      if (error instanceof Error) {
+        if (error.message.includes('logged in')) {
+          router.push('/login')
+        } else {
+          toast.error(error.message)
+        }
+      } else {
+        toast.error('Failed to submit product. Please try again.')
+      }
     }
   }
 
@@ -46,7 +43,10 @@ export default function NewProductPage() {
           </div>
 
           <div className="border p-8">
-            <ProductForm onSubmit={handleSubmit} />
+            <ProductForm 
+              onSubmit={handleSubmit}
+              isSubmitting={createProductMutation.isPending}
+            />
           </div>
         </div>
       </div>

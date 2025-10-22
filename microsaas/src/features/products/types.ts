@@ -1,3 +1,10 @@
+export interface ApiResponse<T> {
+  data: T | null;
+  success: boolean;
+  error: string | null;
+  details?: string;
+}
+
 export type PricingModel = 'free' | 'freemium' | 'premium'
 
 export type Platform = 'web' | 'ios' | 'android' | 'desktop' | 'api' | 'browser_extension' | 'other'
@@ -19,7 +26,7 @@ export interface Product {
   linkedin_url?: string
   product_hunt_url?: string
   platforms: Platform[]
-  maker_id: string
+  user_id: string
   status: 'draft' | 'pending' | 'launched' | 'featured'
   upvotes_count: number
   comments_count: number
