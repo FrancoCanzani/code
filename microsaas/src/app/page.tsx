@@ -1,15 +1,14 @@
-import Link from "next/link";
+import ProductList from "@/features/products/components/product-list";
 import { getCurrentUser } from "@/features/profiles/api";
 import { ProfileDropdown } from "@/features/profiles/components/ProfileDropdown";
+import Link from "next/link";
 
 export default async function Home() {
-
-
   const { user, profile } = await getCurrentUser();
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-50 bg-white border-b p-4 md:p-8 inline-flex items-center justify-between w-full">
+      <header className="sticky top-0 z-50 bg-white p-4 md:p-6 inline-flex items-center justify-between w-full text-sm">
         <Link href={"/"} className="font-mono font-medium text-xl">
           SaasList
         </Link>
@@ -35,15 +34,18 @@ export default async function Home() {
               )}
             </>
           ) : (
-            <Link
-              href="/login"
-              className="font-medium"
-            >
+            <Link href="/login" className="font-medium">
               Sign In
             </Link>
           )}
         </div>
       </header>
+      <main className="p-6 space-y-4">
+        <ProductList date="today" />
+        <ProductList date="yesterday" />
+        <ProductList date="week" />
+        <ProductList date="month" />
+      </main>
     </div>
   );
 }
