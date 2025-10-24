@@ -7,7 +7,7 @@ export default async function Home() {
   const { user, profile } = await getCurrentUser();
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen max-w-6xl mx-auto">
       <header className="sticky top-0 z-50 bg-white p-4 md:p-6 inline-flex items-center justify-between w-full text-sm">
         <Link href={"/"} className="font-mono font-medium text-xl">
           SaasList
@@ -40,7 +40,7 @@ export default async function Home() {
           )}
         </div>
       </header>
-      <main className="p-6 space-y-4">
+      <main className="p-6 space-y-4 max-w-4xl">
         <ProductList date="today" />
         <ProductList date="yesterday" />
         <ProductList date="week" />

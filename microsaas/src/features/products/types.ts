@@ -35,7 +35,7 @@ export interface Product {
   user_id: string;
   upvotes_count: number;
   comments_count: number;
-  views_count: number;
+  is_upvoted?: boolean; 
   created_at: string;
   updated_at: string;
 }

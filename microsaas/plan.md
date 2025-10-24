@@ -52,7 +52,7 @@ Design Supabase tables:
   - mrr (decimal, optional)
   - upvotes_count (integer, default 0)
   - comments_count (integer, default 0)
-  - views_count (integer, default 0)
+  - comments_count (integer, default 0)
   - featured_at (timestamp, nullable)
   - created_at (timestamp)
   - updated_at (timestamp)
@@ -462,4 +462,3 @@ Design Supabase tables:
 - Prioritize MVP features for faster launch
 - Consider launching with core features and iterating based on user feedback
 - Keep the community engaged throughout development with updates and beta access
-
