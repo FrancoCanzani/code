@@ -57,3 +57,22 @@ export interface ProductFormData {
   product_hunt_url?: string;
   platforms: Platform[];
 }
+
+export interface Comment {
+  id: string;
+  product_id: string;
+  user_id: string;
+  parent_id: string | null;
+  content: string;
+  is_flagged: boolean;
+  created_at: string;
+  updated_at: string;
+  user: {
+    name: string;
+    avatar_url: string | null;
+  };
+  replies?: Comment[];
+  reply_count?: number;
+}
+
+export type SortOption = 'newest' | 'oldest' | 'most_replies';

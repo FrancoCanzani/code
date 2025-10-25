@@ -81,3 +81,36 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+CREATE TABLE comments (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  product_id UUID REFERENCES products(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  parent_id UUID REFERENCES comments(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  is_flagged BOOLEAN DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION update_comments_count()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF TG_OP = 'INSERT' THEN
+    UPDATE products 
+    SET comments_count = comments_count + 1 
+    WHERE id = NEW.product_id;
+    RETURN NEW;
+  ELSIF TG_OP = 'DELETE' THEN
+    UPDATE products 
+    SET comments_count = comments_count - 1 
+    WHERE id = OLD.product_id;
+    RETURN OLD;
+  END IF;
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_comments_count_trigger
+  AFTER INSERT OR DELETE ON comments
+  FOR EACH ROW EXECUTE FUNCTION update_comments_count();

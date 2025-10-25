@@ -43,3 +43,13 @@ export const productSchema = z.object({
 
 export type ProductFormData = z.infer<typeof productSchema>
 
+export const commentSchema = z.object({
+  content: z.string()
+    .min(1, 'Comment cannot be empty')
+    .max(5000, 'Comment is too long (max 5000 characters)'),
+  product_id: z.uuid(),
+  parent_id: z.uuid().optional().nullable(),
+});
+
+export type CommentFormData = z.infer<typeof commentSchema>;
+
